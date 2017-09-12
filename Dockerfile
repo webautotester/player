@@ -36,13 +36,11 @@ RUN apt-get install -y \
   gcc-multilib \
   g++-multilib
 
-RUN adduser --quiet --disabled-password --shell /bin/bash --home /home/runner --gecos "User" runner
-
-USER runner
 RUN mkdir /tmp/run
 WORKDIR /tmp/run
-ADD package.json .
+COPY index.js .
+COPY Player.js .
+COPY package.json .
 RUN npm install
-ADD index.js .
 
-CMD xvfb-run --server-args='-screen 0 1024x768x24' node ./index.js
+CMD xvfb-run --server-args='-screen 0 1024x768x24' node ./index.js --mongo=mongo --rabbit=rabbit
