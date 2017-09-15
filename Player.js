@@ -71,7 +71,7 @@ function recordSuccessfulRun(scenarioMsg) {
 					var newRun = {};
 					newRun.sid = new ObjectID(sid);
 					newRun.isSuccess = true;
-					newRun.date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+					newRun.date = new Date().toJSON();//.slice(0,10).replace(/-/g,'/');
 					newRun._id = ObjectID();  
 					runCollection.save(newRun)
 						.then(() => {
