@@ -45,8 +45,15 @@ class Player {
 
 function playScenario(scenarioMsg) {
 	winston.info('Player Begins To Play A Scenario');
-	var actions = JSON.parse(scenarioMsg.content.toString()).actions;
+	const scenarioContent = JSON.parse(scenarioMsg.content.toString());
+	const actions = scenarioContent.actions;
 	const scenario = new wat_action.Scenario(actions);
+	if (scenarioContent.wait && Number(scenarioContent.wait) !== 0) {
+		scenario.addOrUpdateWait(Number(scenarioContent.wait));
+		winston.info(`Wait = ${scenarioContent.wait}`);
+	} else {
+		winston.info('no wait after each action');
+	}
 	const browser = new Nightmare({show:false, loadTimeout: 2000 , gotoTimeout: 3000});
 	scenario.attachTo(browser).end()
 		.then(() => {
