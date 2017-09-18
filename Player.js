@@ -68,7 +68,7 @@ function playScenario(scenarioMsg) {
 
 function recordSuccessfulRun(scenarioMsg) {
 	winston.info('Record Successful Run');
-	var sid = JSON.parse(scenarioMsg.content.toString()).sid;
+	var sid = JSON.parse(scenarioMsg.content.toString())._id;
 	MongoClient.connect(this.dbUrl)
 		.then(db => {
 			db.collection('run', (err, runCollection) => {

@@ -43,4 +43,4 @@ COPY Player.js .
 COPY package.json .
 RUN npm install
 
-CMD xvfb-run --server-args='-screen 0 1024x768x24' node ./index.js --mongo=mongo --rabbit=rabbit
+CMD xvfb-run -a --server-args='-screen 0 1024x768x24' node ./index.js --mongo=mongo --rabbit=rabbit
