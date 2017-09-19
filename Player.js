@@ -44,8 +44,8 @@ class Player {
 }
 
 function playScenario(scenarioMsg) {
-	winston.info('Player Begins To Play A Scenario');
 	const scenarioContent = JSON.parse(scenarioMsg.content.toString());
+	winston.info(`Player Begins To Play A Scenario : ${scenarioContent._id}`);
 	const actions = scenarioContent.actions;
 	const scenario = new wat_action.Scenario(actions);
 	if (scenarioContent.wait && Number(scenarioContent.wait) !== 0) {
@@ -95,8 +95,8 @@ function recordSuccessfulRun(scenarioMsg) {
 }
 
 function recordErrorRun(scenarioMsg, error) {
-	winston.info('Record Error Run');
-	var sid = JSON.parse(scenarioMsg.content.toString()).sid;
+	var sid = JSON.parse(scenarioMsg.content.toString())._id;
+	winston.info(`Record Error Run of scenario ${sid}`);
 	MongoClient.connect(this.dbUrl)
 		.then(db => {
 			db.collection('run', (err, runCollection) => {
@@ -107,7 +107,7 @@ function recordErrorRun(scenarioMsg, error) {
 					newRun.sid = new ObjectID(sid);
 					newRun.isSuccess = false;
 					newRun.error = error;
-					newRun.date = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+					newRun.date = new Date().toJSON();//.slice(0,10).replace(/-/g,'/');
 					newRun._id = ObjectID();  
 					runCollection.save(newRun)
 						.then( () => {
