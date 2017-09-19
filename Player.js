@@ -61,6 +61,7 @@ function playScenario(scenarioMsg) {
 			recordSuccessfulRun.call(this, scenarioMsg);
 		})
 		.catch((e) => {
+			browser.end().then();
 			winston.info('Scenario Error');
 			recordErrorRun.call(this, scenarioMsg, e);
 		});
