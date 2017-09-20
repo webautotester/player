@@ -56,15 +56,15 @@ function playScenario(scenarioMsg) {
 	}
 	winston.info(scenario.toString());
 	const browser = new Nightmare({show:false, loadTimeout: 2000 , gotoTimeout: 3000, switches:{'ignore-certificate-errors': true}});
-	scenario.attachTo(browser).end()
+	scenario.attachTo(browser)
 		.then(() => {
 			winston.info('Scenario Success');
 			recordSuccessfulRun.call(this, scenarioMsg);
+			browser.end().then();
 		})
 		.catch((e) => {
 			winston.info('Scenario Error');
 			winston.info(e);
-			browser.end().then();
 			recordErrorRun.call(this, scenarioMsg, e);
 		});
 }
