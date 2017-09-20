@@ -10,7 +10,7 @@ RUN apt-get update -y \
 	&& apt-get install curl -y
 RUN curl -o /usr/local/bin/n https://raw.githubusercontent.com/visionmedia/n/master/bin/n
 RUN chmod +x /usr/local/bin/n
-RUN n latest
+RUN n stable
 
 # Installing the packages needed to run Headless Nightmare
 RUN apt-get install -y \
