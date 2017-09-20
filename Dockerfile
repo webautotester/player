@@ -10,7 +10,7 @@ RUN apt-get update -y \
 	&& apt-get install curl -y
 RUN curl -o /usr/local/bin/n https://raw.githubusercontent.com/visionmedia/n/master/bin/n
 RUN chmod +x /usr/local/bin/n
-RUN n stable
+RUN n 4.3.2
 
 # Installing the packages needed to run Headless Nightmare
 RUN apt-get install -y \
@@ -46,4 +46,4 @@ RUN npm install
 
 ENV DEBUG=nightmare*
 
-CMD xvfb-run --server-args='-screen 0 1024x768x24' node ./index.js --mongo=mongo --rabbit=rabbit
+CMD xvfb-run -a --server-args='-screen 0 1024x768x24' node ./index.js --mongo=mongo --rabbit=rabbit
