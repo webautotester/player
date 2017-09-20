@@ -57,7 +57,7 @@ function playScenario(scenarioMsg) {
 		winston.info('no wait after each action');
 	}
 	winston.info(scenario.toString());
-	const browser = new Nightmare({show:false, loadTimeout: 2000 , gotoTimeout: 3000, switches:{'ignore-certificate-errors': true}});
+	const browser = new Nightmare({show:false, loadTimeout: 4000 , gotoTimeout: 4000, switches:{'ignore-certificate-errors': true}});
 	scenario.attachTo(browser)
 		.then(() => {
 			winston.info('Scenario Success');
