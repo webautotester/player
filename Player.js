@@ -54,6 +54,7 @@ function playScenario(scenarioMsg) {
 	} else {
 		winston.info('no wait after each action');
 	}
+	winston.info(scenario.toString());
 	const browser = new Nightmare({show:false, loadTimeout: 2000 , gotoTimeout: 3000});
 	scenario.attachTo(browser).end()
 		.then(() => {
@@ -61,8 +62,9 @@ function playScenario(scenarioMsg) {
 			recordSuccessfulRun.call(this, scenarioMsg);
 		})
 		.catch((e) => {
-			browser.end().then();
 			winston.info('Scenario Error');
+			winston.info(e);
+			browser.end().then();
 			recordErrorRun.call(this, scenarioMsg, e);
 		});
 }
