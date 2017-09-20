@@ -40,7 +40,10 @@ RUN mkdir /tmp/run
 WORKDIR /tmp/run
 COPY index.js .
 COPY Player.js .
+COPY testNightmare.js .
 COPY package.json .
 RUN npm install
+
+ENV DEBUG="nightmare*"
 
 CMD xvfb-run --server-args='-screen 0 1024x768x24' node ./index.js --mongo=mongo --rabbit=rabbit
