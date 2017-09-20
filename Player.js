@@ -6,41 +6,43 @@ const ObjectID = require('mongodb').ObjectID;
 const wat_action = require('wat_action_nightmare');
 const QUEUE_NAME = 'wat_queue';
 
-class Player {
-	constructor(serverNames) {
-		this.dbUrl = `mongodb://${serverNames.mongoServerName}:27017/wat_storage`;
-		this.rmqUrl = `amqp://${serverNames.rabbitServerName}`;
-		winston.info(`New Player (${this.dbUrl}) (${this.rmqUrl})`);
-	}
+function Player (serverNames) {
+	this.dbUrl = `mongodb://${serverNames.mongoServerName}:27017/wat_storage`;
+	this.rmqUrl = `amqp://${serverNames.rabbitServerName}`;
+	winston.info(`New Player (${this.dbUrl}) (${this.rmqUrl})`);
 
-	start() {
-		winston.info('Player Started');
-		amqp.connect(this.rmqUrl)
-			.then(conn => {
-				winston.info('connected');
-				this.connection = conn;
-				return conn.createConfirmChannel();
-			})
-			.then(ch => {
-				winston.info('channel created');
-				this.ch = ch;
-				this.ch.assertQueue(QUEUE_NAME, { durable: true });
-				winston.info('Queue Created');
-				this.ch.prefetch(1);
-				this.ch.consume(QUEUE_NAME, scenarioMsg => {
-					if (scenarioMsg !== null) {
-						playScenario.call(this, scenarioMsg);
-					}
-				});
-			})
-			.catch(err => {
-				winston.info(err);
-				setTimeout(() => {
-					this.start(); 
-				}, 2000);
+	this.start = start;
+}
+
+	
+
+
+function start() {
+	winston.info('Player Started');
+	amqp.connect(this.rmqUrl)
+		.then(conn => {
+			winston.info('connected');
+			this.connection = conn;
+			return conn.createConfirmChannel();
+		})
+		.then(ch => {
+			winston.info('channel created');
+			this.ch = ch;
+			this.ch.assertQueue(QUEUE_NAME, { durable: true });
+			winston.info('Queue Created');
+			this.ch.prefetch(1);
+			this.ch.consume(QUEUE_NAME, scenarioMsg => {
+				if (scenarioMsg !== null) {
+					playScenario.call(this, scenarioMsg);
+				}
 			});
-	}
-
+		})
+		.catch(err => {
+			winston.info(err);
+			setTimeout(() => {
+				this.start(); 
+			}, 2000);
+		});
 }
 
 function playScenario(scenarioMsg) {
