@@ -61,12 +61,13 @@ function playScenario(scenarioMsg) {
 	scenario.attachTo(browser)
 		.then(() => {
 			winston.info('Scenario Success');
-			recordSuccessfulRun.call(this, scenarioMsg);
 			browser.end().then();
+			recordSuccessfulRun.call(this, scenarioMsg);
 		})
 		.catch((e) => {
 			winston.info('Scenario Error');
 			winston.info(e);
+			browser.end().then();
 			recordErrorRun.call(this, scenarioMsg, e);
 		});
 }
