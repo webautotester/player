@@ -6,6 +6,8 @@ const ObjectID = require('mongodb').ObjectID;
 const wat_action = require('wat_action_nightmare');
 const QUEUE_NAME = 'wat_queue';
 
+const TIME_OUT = 20000;
+
 function Player (serverNames) {
 	this.dbUrl = `mongodb://${serverNames.mongoServerName}:27017/wat_storage`;
 	this.rmqUrl = `amqp://${serverNames.rabbitServerName}`;
@@ -57,7 +59,7 @@ function playScenario(scenarioMsg) {
 		winston.info('no wait after each action');
 	}
 	winston.info(scenario.toString());
-	const browser = new Nightmare({show:false, loadTimeout: 10000 , gotoTimeout: 10000, switches:{'ignore-certificate-errors': true}});
+	const browser = new Nightmare({show:false, loadTimeout: TIME_OUT , gotoTimeout: TIME_OUT, switches:{'ignore-certificate-errors': true}});
 	scenario.attachTo(browser)
 		.then(() => {
 			winston.info('Scenario Success');
