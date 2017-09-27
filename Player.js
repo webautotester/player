@@ -50,16 +50,10 @@ function start() {
 function playScenario(scenarioMsg) {
 	const scenarioContent = JSON.parse(scenarioMsg.content.toString());
 	winston.info(`Player Begins To Play A Scenario : ${scenarioContent._id}`);
-	const actions = scenarioContent.actions;
+	const actions = createWATScenario(scenarioContent);
 	const scenario = new wat_action.Scenario(actions);
-	if (scenarioContent.wait && Number(scenarioContent.wait) !== 0) {
-		scenario.addOrUpdateWait(Number(scenarioContent.wait));
-		winston.info(`Wait = ${scenarioContent.wait}`);
-	} else {
-		winston.info('no wait after each action');
-	}
 	winston.info(scenario.toString());
-	const browser = new Nightmare({show:false, loadTimeout: TIME_OUT , gotoTimeout: TIME_OUT, switches:{'ignore-certificate-errors': true}});
+	const browser = new Nightmare({show:true, loadTimeout: TIME_OUT , gotoTimeout: TIME_OUT, switches:{'ignore-certificate-errors': true}});
 	scenario.attachTo(browser)
 		.then(() => {
 			winston.info('Scenario Success');
@@ -72,6 +66,44 @@ function playScenario(scenarioMsg) {
 			browser.end().then();
 			recordErrorRun.call(this, scenarioMsg, e);
 		});
+}
+
+function createWATScenario(scenario) {
+	var wait = scenario.wait || 0;
+	var cssSelector = scenario.cssselector || 'watId';
+	var actions = [];
+	winston.info(cssSelector);
+	scenario.actions.forEach((action) => {
+		var watAction = {
+			type: action.type
+		};
+		watAction.url = action.url || undefined;
+		watAction.text = action.text || undefined;
+		if (action.selector) {
+			watAction.selector = action.selector[cssSelector];
+			if (actions.length
+			&& action.type === 'TypeAction'
+			&& actions[actions.length - 1].type === 'TypeAction'
+			&& actions[actions.length - 1].selector === action.selector) {
+				actions.pop();
+			}
+		}
+		actions.push(watAction);
+	});
+
+	if (wait > 0) {
+		var actionsWithWait = [];
+		for (let index = 0; index < actions.length ; index++) {
+			actionsWithWait.push(actions[index]);
+			actionsWithWait.push({
+				type: 'WaitAction',
+				ms: Number(wait)
+			});
+		}
+		return actionsWithWait;
+	} else {
+		return actions;
+	}
 }
 
 function recordSuccessfulRun(scenarioMsg) {
