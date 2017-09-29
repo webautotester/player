@@ -53,7 +53,7 @@ function playScenario(scenarioMsg) {
 	const actions = createWATScenario(scenarioContent);
 	const scenario = new wat_action.Scenario(actions);
 	winston.info(scenario.toString());
-	const browser = new Nightmare({show:false, loadTimeout: TIME_OUT , gotoTimeout: TIME_OUT, switches:{'ignore-certificate-errors': true}});
+	const browser = new Nightmare({show:true, loadTimeout: TIME_OUT , gotoTimeout: TIME_OUT, switches:{'ignore-certificate-errors': true}});
 	scenario.attachTo(browser)
 		.then(() => {
 			winston.info('Scenario Success');
@@ -84,7 +84,7 @@ function createWATScenario(scenario) {
 			if (actions.length
 			&& action.type === 'TypeAction'
 			&& actions[actions.length - 1].type === 'TypeAction'
-			&& actions[actions.length - 1].selector === action.selector) {
+			&& actions[actions.length - 1].selector === action.selector[cssSelector]) {
 				actions.pop();
 			}
 		}
