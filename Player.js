@@ -155,7 +155,7 @@ function recordErrorRun(scenarioMsg, error) {
 						uid : new ObjectID(uid),
 						isSuccess : false,
 						read : false,
-						error : err,
+						error : error,
 						date : new Date().toJSON(),//.slice(0,10).replace(/-/g,'/');
 						_id : ObjectID()  
 					};
