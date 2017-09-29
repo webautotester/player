@@ -140,7 +140,9 @@ function recordSuccessfulRun(scenarioMsg) {
 }
 
 function recordErrorRun(scenarioMsg, error) {
-	var sid = JSON.parse(scenarioMsg.content.toString())._id;
+	var scenarioObj = JSON.parse(scenarioMsg.content.toString());
+	var sid = scenarioObj._id;
+	var uid = scenarioObj.uid;
 	winston.info(`Record Error Run of scenario ${sid}`);
 	MongoClient.connect(this.dbUrl)
 		.then(db => {
@@ -148,12 +150,14 @@ function recordErrorRun(scenarioMsg, error) {
 				if (err) {
 					winston.error(err);
 				} else {
-					var newRun = {};
-					newRun.sid = new ObjectID(sid);
-					newRun.isSuccess = false;
-					newRun.error = error;
-					newRun.date = new Date().toJSON();//.slice(0,10).replace(/-/g,'/');
-					newRun._id = ObjectID();  
+					var newRun = {
+						sid : new ObjectID(sid),
+						uid : new ObjectID(uid),
+						isSuccess : false,
+						error : error,
+						date : new Date().toJSON(),//.slice(0,10).replace(/-/g,'/');
+						_id : ObjectID()  
+					};
 					runCollection.save(newRun)
 						.then( () => {
 							winston.info('Error Run Has Been Saved');
