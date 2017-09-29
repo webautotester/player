@@ -108,18 +108,23 @@ function createWATScenario(scenario) {
 
 function recordSuccessfulRun(scenarioMsg) {
 	winston.info('Record Successful Run');
-	var sid = JSON.parse(scenarioMsg.content.toString())._id;
+	var scenarioObj = JSON.parse(scenarioMsg.content.toString());
+	var sid = scenarioObj._id;
+	var uid = scenarioObj.uid;
 	MongoClient.connect(this.dbUrl)
 		.then(db => {
 			db.collection('run', (err, runCollection) => {
 				if (err) {
 					winston.error(err);
 				} else {
-					var newRun = {};
-					newRun.sid = new ObjectID(sid);
-					newRun.isSuccess = true;
-					newRun.date = new Date().toJSON();//.slice(0,10).replace(/-/g,'/');
-					newRun._id = ObjectID();  
+					var newRun = {
+						sid : new ObjectID(sid),
+						uid : new ObjectID(uid),
+						isSuccess : true,
+						read : false,
+						date : new Date().toJSON(),//.slice(0,10).replace(/-/g,'/');
+						_id : ObjectID()
+					};
 					runCollection.save(newRun)
 						.then(() => {
 							winston.info('Successful Run Has Been Saved');
