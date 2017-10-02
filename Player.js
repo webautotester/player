@@ -55,12 +55,33 @@ function playScenario(scenarioMsg) {
 	winston.info(scenario.toString());
 	const browser = new Nightmare({show:true, loadTimeout: TIME_OUT , gotoTimeout: TIME_OUT, switches:{'ignore-certificate-errors': true}});
 	scenario.attachTo(browser)
-		.then(() => {
+		.evaluate( (assert) => {
+			if (assert && !assert.end) {
+				var testedElement = document.getElementById(assert.selector);
+				var obtained;
+				switch (assert.property) {
+				case 'value' : obtained = testedElement.value;
+					break;
+				case 'innerHTML' : obtained = testedElement.innerHTML;
+					break;
+				default : obtained = '';
+				}
+				return obtained.indexOf(assert.contains) !== -1;
+			} else {
+				return true;
+			}
+		},scenarioContent.assert)
+		.then((testResult) => {
 			winston.info('Scenario Success');
 			var _id = ObjectID();
 			var path = `/tmp/run/screen/${_id}.png`;
 			browser.screenshot(path).end().then();
-			recordSuccessfulRun.call(this, scenarioMsg, _id);
+			if (testResult) {
+				recordSuccessfulRun.call(this, scenarioMsg, _id);
+			} else {
+				var error = 'assertion fails';
+				recordErrorRun.call(this, scenarioMsg, _id, error);	
+			}
 		})
 		.catch((e) => {
 			winston.info('Scenario Error');
