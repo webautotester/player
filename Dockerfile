@@ -38,6 +38,7 @@ RUN apt-get install -y \
 
 RUN mkdir /tmp/run
 WORKDIR /tmp/run
+RUN mkdir screen
 COPY index.js .
 COPY Player.js .
 COPY testNightmare.js .

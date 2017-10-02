@@ -57,14 +57,18 @@ function playScenario(scenarioMsg) {
 	scenario.attachTo(browser)
 		.then(() => {
 			winston.info('Scenario Success');
-			browser.end().then();
-			recordSuccessfulRun.call(this, scenarioMsg);
+			var _id = ObjectID();
+			var path = `/tmp/run/screen/${_id}.png`;
+			browser.screenshot(path).end().then();
+			recordSuccessfulRun.call(this, scenarioMsg, _id);
 		})
 		.catch((e) => {
 			winston.info('Scenario Error');
 			winston.info(e);
-			browser.end().then();
-			recordErrorRun.call(this, scenarioMsg, e);
+			var _id = ObjectID();
+			var path = `/tmp/run/screen/${_id}.png`;
+			browser.screenshot(path).end().then();
+			recordErrorRun.call(this, scenarioMsg, _id, e);
 		});
 }
 
@@ -106,7 +110,7 @@ function createWATScenario(scenario) {
 	}
 }
 
-function recordSuccessfulRun(scenarioMsg) {
+function recordSuccessfulRun(scenarioMsg, _id) {
 	winston.info('Record Successful Run');
 	var scenarioObj = JSON.parse(scenarioMsg.content.toString());
 	var sid = scenarioObj._id;
@@ -123,7 +127,7 @@ function recordSuccessfulRun(scenarioMsg) {
 						isSuccess : true,
 						read : false,
 						date : new Date().toJSON(),//.slice(0,10).replace(/-/g,'/');
-						_id : ObjectID()
+						_id : _id
 					};
 					runCollection.save(newRun)
 						.then(() => {
@@ -139,7 +143,7 @@ function recordSuccessfulRun(scenarioMsg) {
 		});
 }
 
-function recordErrorRun(scenarioMsg, error) {
+function recordErrorRun(scenarioMsg, _id, error) {
 	var scenarioObj = JSON.parse(scenarioMsg.content.toString());
 	var sid = scenarioObj._id;
 	var uid = scenarioObj.uid;
@@ -157,7 +161,7 @@ function recordErrorRun(scenarioMsg, error) {
 						read : false,
 						error : error,
 						date : new Date().toJSON(),//.slice(0,10).replace(/-/g,'/');
-						_id : ObjectID()  
+						_id : _id  
 					};
 					runCollection.save(newRun)
 						.then( () => {
