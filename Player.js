@@ -95,24 +95,14 @@ function playScenario(scenarioMsg) {
 
 function createWATScenario(scenario) {
 	var wait = scenario.wait || 0;
-	var cssSelector = scenario.cssselector || 'watId';
 	var actions = [];
-	winston.info(cssSelector);
 	scenario.actions.forEach((action) => {
 		var watAction = {
 			type: action.type
 		};
 		watAction.url = action.url || undefined;
 		watAction.text = action.text || undefined;
-		if (action.selector) {
-			watAction.selector = action.selector[cssSelector];
-			if (actions.length
-			&& action.type === 'TypeAction'
-			&& actions[actions.length - 1].type === 'TypeAction'
-			&& actions[actions.length - 1].selector === action.selector[cssSelector]) {
-				actions.pop();
-			}
-		}
+		watAction.selector = action.selector;
 		actions.push(watAction);
 	});
 
