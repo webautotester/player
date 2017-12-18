@@ -57,7 +57,7 @@ function playScenario(scenarioMsg) {
 	scenario.attachTo(browser)
 		.evaluate( (assert) => {
 			if (assert && !assert.end) {
-				var testedElement = document.getElementById(assert.selector);
+				var testedElement = document.querySelector(assert.selector);
 				var obtained;
 				switch (assert.property) {
 				case 'value' : obtained = testedElement.value;
