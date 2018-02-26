@@ -1,5 +1,5 @@
 const winston = require('winston');
-const Nightmare = require('nightmare');
+const puppeteer = require('puppeteer');
 const amqp = require('amqplib');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
@@ -16,7 +16,7 @@ function Player (serverNames) {
 	this.start = start;
 }
 
-	
+
 
 
 function start() {
@@ -42,7 +42,7 @@ function start() {
 		.catch(err => {
 			winston.info(err);
 			setTimeout(() => {
-				this.start(); 
+				this.start();
 			}, 2000);
 		});
 }
@@ -53,8 +53,9 @@ function playScenario(scenarioMsg) {
 	const actions = createWATScenario(scenarioContent);
 	const scenario = new wat_action.Scenario(actions);
 	winston.info(scenario.toString());
-	const browser = new Nightmare({show:true, loadTimeout: TIME_OUT , gotoTimeout: TIME_OUT, switches:{'ignore-certificate-errors': true}});
-	scenario.attachTo(browser)
+	const browser = await puppeteer.launch({headless: false});
+	const page = await browser.newPage();
+	let run = await scenario.run(page, 'PUPPETEER')
 		.evaluate( (assert) => {
 			if (assert && !assert.end) {
 				var testedElement = document.querySelector(assert.selector);
@@ -80,7 +81,7 @@ function playScenario(scenarioMsg) {
 				recordSuccessfulRun.call(this, scenarioMsg, _id);
 			} else {
 				var error = 'assertion fails';
-				recordErrorRun.call(this, scenarioMsg, _id, error);	
+				recordErrorRun.call(this, scenarioMsg, _id, error);
 			}
 		})
 		.catch((e) => {
@@ -91,6 +92,7 @@ function playScenario(scenarioMsg) {
 			browser.screenshot(path).end().then();
 			recordErrorRun.call(this, scenarioMsg, _id, e);
 		});
+	console.log(JSON.stringify(run));
 }
 
 function createWATScenario(scenario) {
@@ -172,7 +174,7 @@ function recordErrorRun(scenarioMsg, _id, error) {
 						read : false,
 						error : error,
 						date : new Date().toJSON(),//.slice(0,10).replace(/-/g,'/');
-						_id : _id  
+						_id : _id
 					};
 					runCollection.save(newRun)
 						.then( () => {
